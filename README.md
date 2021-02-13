@@ -10,7 +10,7 @@
 
 bilibili
 
-[![bilibili](https://github.com/dyh/)](https://space.bilibili.com/326361150/ "bilibili")
+[![bilibili](https://github.com/dyh/unbox_yolov5_deepsort_counting/blob/main/cover.jpg?raw=true)](https://www.bilibili.com/video/BV14z4y127XX/ "bilibili")
 
 
 ## 运行环境
