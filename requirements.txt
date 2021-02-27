@@ -13,7 +13,7 @@ Pillow
 pkg-resources
 pyparsing
 python-dateutil
-pyyam
+pyyaml
 requests
 scipy
 six
