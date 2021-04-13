@@ -70,7 +70,7 @@ bilibili
 
 8. 在 main.py 文件中第66行，设置要检测的视频文件路径，默认为 './video/test.mp4'
 
-    > 140MB的测试视频可以在这里下载：https://pan.baidu.com/s/1geqjht-no0iyzQ88JQopwA  密码: i6cs
+    > 140MB的测试视频可以在这里下载：https://pan.baidu.com/s/1qHNGGpX1QD6zHyNTqWvg1w 提取码: 8ufq 
  
     ```
     capture = cv2.VideoCapture('./video/test.mp4')
@@ -83,7 +83,7 @@ bilibili
     ```
 
 
-## 引用
+## 使用框架
 
 - https://github.com/Sharpiless/Yolov5-deepsort-inference
 - https://github.com/ultralytics/yolov5/
