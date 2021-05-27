@@ -16,7 +16,7 @@ deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
 
 def draw_bboxes(image, bboxes, line_thickness):
     line_thickness = line_thickness or round(
-        0.002 * (image.shape[0] + image.shape[1]) / 2) + 1
+        0.002 * (image.shape[0] + image.shape[1]) * 0.5) + 1
 
     list_pts = []
     point_radius = 4
@@ -38,10 +38,10 @@ def draw_bboxes(image, bboxes, line_thickness):
         cv2.putText(image, '{} ID-{}'.format(cls_id, pos_id), (c1[0], c1[1] - 2), 0, line_thickness / 3,
                     [225, 255, 255], thickness=font_thickness, lineType=cv2.LINE_AA)
 
-        list_pts.append([check_point_x-point_radius, check_point_y-point_radius])
-        list_pts.append([check_point_x-point_radius, check_point_y+point_radius])
-        list_pts.append([check_point_x+point_radius, check_point_y+point_radius])
-        list_pts.append([check_point_x+point_radius, check_point_y-point_radius])
+        list_pts.append([check_point_x - point_radius, check_point_y - point_radius])
+        list_pts.append([check_point_x - point_radius, check_point_y + point_radius])
+        list_pts.append([check_point_x + point_radius, check_point_y + point_radius])
+        list_pts.append([check_point_x + point_radius, check_point_y - point_radius])
 
         ndarray_pts = np.array(list_pts, np.int32)
 
@@ -60,7 +60,7 @@ def update(bboxes, image):
     if len(bboxes) > 0:
         for x1, y1, x2, y2, lbl, conf in bboxes:
             obj = [
-                int((x1 + x2) / 2), int((y1 + y2) / 2),
+                int((x1 + x2) * 0.5), int((y1 + y2) * 0.5),
                 x2 - x1, y2 - y1
             ]
             bbox_xywh.append(obj)
@@ -71,10 +71,60 @@ def update(bboxes, image):
 
         outputs = deepsort.update(xywhs, confss, image)
 
-        for value in list(outputs):
-            x1, y1, x2, y2, track_id = value
-            bboxes2draw.append((x1, y1, x2, y2, '', track_id))
+        for x1, y1, x2, y2, track_id in list(outputs):
+            # x1, y1, x2, y2, track_id = value
+            center_x = (x1 + x2) * 0.5
+            center_y = (y1 + y2) * 0.5
+
+            label = search_label(center_x=center_x, center_y=center_y,
+                                 bboxes_xyxy=bboxes, max_dist_threshold=20.0)
+
+            bboxes2draw.append((x1, y1, x2, y2, label, track_id))
         pass
     pass
 
     return bboxes2draw
+
+
+def search_label(center_x, center_y, bboxes_xyxy, max_dist_threshold):
+    """
+    在 yolov5 的 bbox 中搜索中心点最接近的label
+    :param center_x:
+    :param center_y:
+    :param bboxes_xyxy:
+    :param max_dist_threshold:
+    :return: 字符串
+    """
+    label = ''
+    # min_label = ''
+    min_dist = -1.0
+
+    for x1, y1, x2, y2, lbl, conf in bboxes_xyxy:
+        center_x2 = (x1 + x2) * 0.5
+        center_y2 = (y1 + y2) * 0.5
+
+        # 横纵距离都小于 max_dist
+        min_x = abs(center_x2 - center_x)
+        min_y = abs(center_y2 - center_y)
+
+        if min_x < max_dist_threshold and min_y < max_dist_threshold:
+            # 距离阈值，判断是否在允许误差范围内
+            # 取 x, y 方向上的距离平均值
+            avg_dist = (min_x + min_y) * 0.5
+            if min_dist == -1.0:
+                # 第一次赋值
+                min_dist = avg_dist
+                # 赋值label
+                label = lbl
+                pass
+            else:
+                # 若不是第一次，则距离小的优先
+                if avg_dist < min_dist:
+                    min_dist = avg_dist
+                    # label
+                    label = lbl
+                pass
+            pass
+        pass
+
+    return label

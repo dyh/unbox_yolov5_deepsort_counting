@@ -97,7 +97,7 @@ if __name__ == '__main__':
         if len(list_bboxs) > 0:
             # ----------------------判断撞线----------------------
             for item_bbox in list_bboxs:
-                x1, y1, x2, y2, _, track_id = item_bbox
+                x1, y1, x2, y2, label, track_id = item_bbox
 
                 # 撞线检测点，(x1，y1)，y方向偏移比例 0.0~1.0
                 y1_offset = int(y1 + ((y2 - y1) * 0.6))
@@ -118,7 +118,7 @@ if __name__ == '__main__':
                         # 外出+1
                         up_count += 1
 
-                        print('up count:', up_count, ', up id:', list_overlapping_yellow_polygon)
+                        print(f'类别: {label} | id: {track_id} | 上行撞线 | 上行撞线总数: {up_count} | 上行id列表: {list_overlapping_yellow_polygon}')
 
                         # 删除 黄polygon list 中的此id
                         list_overlapping_yellow_polygon.remove(track_id)
@@ -140,7 +140,7 @@ if __name__ == '__main__':
                         # 进入+1
                         down_count += 1
 
-                        print('down count:', down_count, ', down id:', list_overlapping_blue_polygon)
+                        print(f'类别: {label} | id: {track_id} | 下行撞线 | 下行撞线总数: {down_count} | 下行id列表: {list_overlapping_blue_polygon}')
 
                         # 删除 蓝polygon list 中的此id
                         list_overlapping_blue_polygon.remove(track_id)
